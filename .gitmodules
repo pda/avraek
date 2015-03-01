@@ -1,0 +1,3 @@
+[submodule "avr-uart"]
+	path = avr-uart
+	url = git://github.com/andygock/avr-uart
