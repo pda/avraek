@@ -12,14 +12,21 @@
 void setup();
 void loop();
 
+struct adb_cmd {
+  uint8_t address;
+  uint8_t command;
+  uint8_t reg;
+};
+
 void adb_reset();
 void adb_data_mode_input();
 void adb_data_mode_output();
-void adb_send_command(uint8_t addr, uint8_t cmd, uint8_t reg);
-void adb_command_packet(uint8_t addr, uint8_t cmd, uint8_t reg);
+void adb_send_command(struct adb_cmd);
+void adb_command_packet(struct adb_cmd);
 void adb_command_byte(uint8_t byte);
 void adb_command_bit_low();
 void adb_command_bit_high();
+uint8_t adb_cmd_to_byte(struct adb_cmd);
 
 int main() {
   setup();
@@ -29,11 +36,12 @@ int main() {
 void setup() {
   adb_reset();
   _delay_ms(1); // arbitrary
-  adb_send_command(
-    ADB_KB_ADDRESS,
-    ADB_COMMAND_TALK,
-    ADB_REGISTER_INFO
-  );
+  struct adb_cmd cmd = {
+    .address = ADB_KB_ADDRESS,
+    .command = ADB_COMMAND_TALK,
+    .reg = ADB_REGISTER_INFO
+  };
+  adb_send_command(cmd);
 }
 
 void loop() {
@@ -56,18 +64,18 @@ void adb_data_mode_output() {
   DDRB |= ADB_DATA_MASK;
 }
 
-void adb_send_command(uint8_t addr, uint8_t cmd, uint8_t reg) {
+void adb_send_command(struct adb_cmd cmd) {
   adb_data_mode_output();
   ADB_LOW();
   _delay_us(800); // Attention signal
   ADB_HIGH();
   _delay_us(70); // Sync signal
-  adb_command_packet(addr, cmd, reg);
+  adb_command_packet(cmd);
   adb_data_mode_input();
 }
 
-void adb_command_packet(uint8_t addr, uint8_t cmd, uint8_t reg) {
-  adb_command_byte((addr << 4 & 0b11110000) | (cmd << 2 & 0b00001100) | (reg & 0b00000011));
+void adb_command_packet(struct adb_cmd cmd) {
+  adb_command_byte(adb_cmd_to_byte(cmd));
   adb_command_bit_low(); // stop-bit
 }
 
@@ -94,4 +102,8 @@ void adb_command_bit_high() {
   _delay_us(35);
   ADB_HIGH();
   _delay_us(65);
+}
+
+uint8_t adb_cmd_to_byte(struct adb_cmd cmd) {
+  return (cmd.address << 4) | (cmd.command << 2) | (cmd.reg);
 }
