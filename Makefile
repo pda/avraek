@@ -1,7 +1,7 @@
 MCU = atmega328p
 F_CPU = 16000000
 PROGRAMMER = arduino
-PORT = /dev/cu.usbmodem1421
+PORT = /dev/cu.usbmodem14231
 
 GCC_FLAGS = -std=c99 -Wall -g -Os -mmcu=$(MCU) -DF_CPU=$(F_CPU)
 
