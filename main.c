@@ -1,9 +1,13 @@
 #include <avr/io.h>
 #include <util/delay.h>
 
-#define ADB_DATA_MASK (0b00000001)
+#define ADB_DATA_MASK 0b00000001
 #define ADB_HIGH() (PORTB |= ADB_DATA_MASK)
 #define ADB_LOW() (PORTB &= ~ADB_DATA_MASK)
+#define ADB_COMMAND_TALK 0b11
+#define ADB_KB_ADDRESS 0b0010
+#define ADB_REGISTER_DEFAULT 0b00
+#define ADB_REGISTER_INFO 0b11
 
 void setup();
 void loop();
@@ -11,6 +15,11 @@ void loop();
 void adb_reset();
 void adb_data_mode_input();
 void adb_data_mode_output();
+void adb_send_command(uint8_t addr, uint8_t cmd, uint8_t reg);
+void adb_command_packet(uint8_t addr, uint8_t cmd, uint8_t reg);
+void adb_command_byte(uint8_t byte);
+void adb_command_bit_low();
+void adb_command_bit_high();
 
 int main() {
   setup();
@@ -19,6 +28,12 @@ int main() {
 
 void setup() {
   adb_reset();
+  _delay_ms(1); // arbitrary
+  adb_send_command(
+    ADB_KB_ADDRESS,
+    ADB_COMMAND_TALK,
+    ADB_REGISTER_INFO
+  );
 }
 
 void loop() {
@@ -39,4 +54,44 @@ void adb_data_mode_input() {
 void adb_data_mode_output() {
   ADB_HIGH(); // output high to match pull-up resistor
   DDRB |= ADB_DATA_MASK;
+}
+
+void adb_send_command(uint8_t addr, uint8_t cmd, uint8_t reg) {
+  adb_data_mode_output();
+  ADB_LOW();
+  _delay_us(800); // Attention signal
+  ADB_HIGH();
+  _delay_us(70); // Sync signal
+  adb_command_packet(addr, cmd, reg);
+  adb_data_mode_input();
+}
+
+void adb_command_packet(uint8_t addr, uint8_t cmd, uint8_t reg) {
+  adb_command_byte((addr << 4 & 0b11110000) | (cmd << 2 & 0b00001100) | (reg & 0b00000011));
+  adb_command_bit_low(); // stop-bit
+}
+
+void adb_command_byte(uint8_t byte) {
+  for (int i = 0; i < 8; i++) {
+    if (byte & (1 << 7)) {
+      adb_command_bit_high();
+    } else {
+      adb_command_bit_low();
+    }
+    byte <<= 1;
+  }
+}
+
+void adb_command_bit_low() {
+  ADB_LOW();
+  _delay_us(65);
+  ADB_HIGH();
+  _delay_us(35);
+}
+
+void adb_command_bit_high() {
+  ADB_LOW();
+  _delay_us(35);
+  ADB_HIGH();
+  _delay_us(65);
 }
