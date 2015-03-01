@@ -10,13 +10,13 @@ void adb_reset() {
 }
 
 void adb_data_mode_input() {
-  DDRB &= ~ADB_DATA_MASK;
-  PORTB &= ~ADB_DATA_MASK; // hi-Z input
+  ADB_DDR &= ~ADB_DATA_MASK;
+  ADB_PORT &= ~ADB_DATA_MASK; // hi-Z input
 }
 
 void adb_data_mode_output() {
   ADB_HIGH(); // output high to match pull-up resistor
-  DDRB |= ADB_DATA_MASK;
+  ADB_DDR |= ADB_DATA_MASK;
 }
 
 void adb_send_command(struct adb_cmd cmd) {

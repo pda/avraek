@@ -2,10 +2,15 @@
 
 #include <stdint.h>
 
+// Makefile provides these as compiler flags:
+// #define ADB_PORT PORTB
+// #define ADB_DDR DDRB
+// #define ADB_DATA_PIN
+
 #define ADB_DATA_MASK (1 << ADB_DATA_PIN)
 
-#define ADB_HIGH() (PORTB |= ADB_DATA_MASK)
-#define ADB_LOW() (PORTB &= ~ADB_DATA_MASK)
+#define ADB_HIGH() (ADB_PORT |= ADB_DATA_MASK)
+#define ADB_LOW() (ADB_PORT &= ~ADB_DATA_MASK)
 
 #define ADB_COMMAND_TALK 0b11
 #define ADB_KB_ADDRESS 0b0010
