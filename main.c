@@ -23,12 +23,8 @@ int main() {
 
 void setup() {
   initialize_uart();
-  printf("\n\n");
-  printf("Initializing ADB\n");
   adb_reset();
-  printf("Initializing keyboard\n");
   initialize_adb_keyboard();
-  printf("Done\n");
 }
 
 void loop() {
@@ -48,8 +44,7 @@ void initialize_adb_keyboard() {
     .reg = ADB_REGISTER_INFO
   };
   adb_send_command(cmd);
-  uint16_t response = adb_read16();
-  printf("response: 0x%04X\r\n", response);
+  adb_read16();
   adb_keyboard_animate_leds();
 }
 
