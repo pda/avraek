@@ -35,28 +35,28 @@ void adb_send_command(struct adb_cmd cmd) {
 
 void adb_command_packet(struct adb_cmd cmd) {
   adb_send_byte(adb_cmd_to_byte(cmd));
-  adb_write_low(); // stop-bit
+  adb_send_low(); // stop-bit
 }
 
 void adb_send_byte(uint8_t byte) {
   for (int i = 0; i < 8; i++) {
     if (byte & (1 << 7)) {
-      adb_write_high();
+      adb_send_high();
     } else {
-      adb_write_low();
+      adb_send_low();
     }
     byte <<= 1;
   }
 }
 
-void adb_write_low() {
+void adb_send_low() {
   ADB_LOW();
   _delay_us(65);
   ADB_HIGH();
   _delay_us(35);
 }
 
-void adb_write_high() {
+void adb_send_high() {
   ADB_LOW();
   _delay_us(35);
   ADB_HIGH();
@@ -100,10 +100,10 @@ uint16_t adb_read16() {
 void adb_write16(uint16_t data) {
   adb_data_mode_output();
   _delay_us(150); // Tlt (stop-to-start time)
-  adb_write_high(); // start-bit
+  adb_send_high(); // start-bit
   adb_send_byte((uint8_t)(data >> 8));
   adb_send_byte((uint8_t)data);
-  adb_write_low(); // stop-bit
+  adb_send_low(); // stop-bit
   adb_data_mode_input();
 }
 
