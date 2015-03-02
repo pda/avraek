@@ -31,29 +31,29 @@ void adb_send_command(struct adb_cmd cmd) {
 }
 
 void adb_command_packet(struct adb_cmd cmd) {
-  adb_command_byte(adb_cmd_to_byte(cmd));
-  adb_command_bit_low(); // stop-bit
+  adb_write8(adb_cmd_to_byte(cmd));
+  adb_write_low(); // stop-bit
 }
 
-void adb_command_byte(uint8_t byte) {
+void adb_write8(uint8_t byte) {
   for (int i = 0; i < 8; i++) {
     if (byte & (1 << 7)) {
-      adb_command_bit_high();
+      adb_write_high();
     } else {
-      adb_command_bit_low();
+      adb_write_low();
     }
     byte <<= 1;
   }
 }
 
-void adb_command_bit_low() {
+void adb_write_low() {
   ADB_LOW();
   _delay_us(65);
   ADB_HIGH();
   _delay_us(35);
 }
 
-void adb_command_bit_high() {
+void adb_write_high() {
   ADB_LOW();
   _delay_us(35);
   ADB_HIGH();
