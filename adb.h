@@ -25,15 +25,18 @@ struct adb_cmd {
   uint8_t reg;
 };
 
+// Public
 void adb_reset();
+void adb_send_command(struct adb_cmd);
+void adb_keyboard_animate_leds();
+
+// Private
+uint8_t adb_cmd_to_byte(struct adb_cmd);
+void adb_command_data_16(uint16_t);
+void adb_command_packet(struct adb_cmd);
 void adb_data_mode_input();
 void adb_data_mode_output();
-void adb_send_command(struct adb_cmd);
-void adb_command_packet(struct adb_cmd);
-void adb_send_byte(uint8_t byte);
-void adb_send_low();
-void adb_send_high();
-uint8_t adb_cmd_to_byte(struct adb_cmd);
 uint16_t adb_receive_16();
-void adb_command_data_16(uint16_t);
-void adb_keyboard_animate_leds();
+void adb_send_byte(uint8_t byte);
+void adb_send_high();
+void adb_send_low();

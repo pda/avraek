@@ -3,6 +3,8 @@
 #include <util/delay.h>
 #include <stdio.h>
 
+// Public
+
 void adb_reset() {
   _delay_ms(100); // stabilize on power-up
   adb_data_mode_output();
@@ -11,16 +13,6 @@ void adb_reset() {
   ADB_HIGH();
   adb_data_mode_input();
   _delay_ms(200); // give time to reset
-}
-
-void adb_data_mode_input() {
-  ADB_DDR &= ~ADB_DATA_MASK;
-  ADB_PORT &= ~ADB_DATA_MASK; // hi-Z input
-}
-
-void adb_data_mode_output() {
-  ADB_HIGH(); // output high to match pull-up resistor
-  ADB_DDR |= ADB_DATA_MASK;
 }
 
 void adb_send_command(struct adb_cmd cmd) {
@@ -33,38 +25,58 @@ void adb_send_command(struct adb_cmd cmd) {
   adb_data_mode_input();
 }
 
+void adb_keyboard_animate_leds() {
+  struct adb_cmd listen = {
+    .address = ADB_KB_ADDRESS,
+    .command = ADB_COMMAND_LISTEN,
+    .reg = 2
+  };
+  uint16_t states[] = {
+    //SCN: Scroll, Caps, Num
+    0b001,
+    0b011,
+    0b111,
+    0b111,
+    0b110,
+    0b100,
+    0b000,
+  };
+  for (int i = 0; i < sizeof(states) / sizeof(uint16_t); i++) {
+    adb_send_command(listen);
+    adb_command_data_16(~states[i]);
+    _delay_ms(50);
+  }
+}
+
+// Private
+
+uint8_t adb_cmd_to_byte(struct adb_cmd cmd) {
+  return (cmd.address << 4) | (cmd.command << 2) | (cmd.reg);
+}
+
+void adb_command_data_16(uint16_t data) {
+  adb_data_mode_output();
+  _delay_us(150); // Tlt (stop-to-start time)
+  adb_send_high(); // start-bit
+  adb_send_byte((uint8_t)(data >> 8));
+  adb_send_byte((uint8_t)data);
+  adb_send_low(); // stop-bit
+  adb_data_mode_input();
+}
+
 void adb_command_packet(struct adb_cmd cmd) {
   adb_send_byte(adb_cmd_to_byte(cmd));
   adb_send_low(); // stop-bit
 }
 
-void adb_send_byte(uint8_t byte) {
-  for (int i = 0; i < 8; i++) {
-    if (byte & (1 << 7)) {
-      adb_send_high();
-    } else {
-      adb_send_low();
-    }
-    byte <<= 1;
-  }
+void adb_data_mode_input() {
+  ADB_DDR &= ~ADB_DATA_MASK;
+  ADB_PORT &= ~ADB_DATA_MASK; // hi-Z input
 }
 
-void adb_send_low() {
-  ADB_LOW();
-  _delay_us(65);
-  ADB_HIGH();
-  _delay_us(35);
-}
-
-void adb_send_high() {
-  ADB_LOW();
-  _delay_us(35);
-  ADB_HIGH();
-  _delay_us(65);
-}
-
-uint8_t adb_cmd_to_byte(struct adb_cmd cmd) {
-  return (cmd.address << 4) | (cmd.command << 2) | (cmd.reg);
+void adb_data_mode_output() {
+  ADB_HIGH(); // output high to match pull-up resistor
+  ADB_DDR |= ADB_DATA_MASK;
 }
 
 /**
@@ -97,35 +109,27 @@ uint16_t adb_receive_16() {
   return response;
 }
 
-void adb_command_data_16(uint16_t data) {
-  adb_data_mode_output();
-  _delay_us(150); // Tlt (stop-to-start time)
-  adb_send_high(); // start-bit
-  adb_send_byte((uint8_t)(data >> 8));
-  adb_send_byte((uint8_t)data);
-  adb_send_low(); // stop-bit
-  adb_data_mode_input();
+void adb_send_byte(uint8_t byte) {
+  for (int i = 0; i < 8; i++) {
+    if (byte & (1 << 7)) {
+      adb_send_high();
+    } else {
+      adb_send_low();
+    }
+    byte <<= 1;
+  }
 }
 
-void adb_keyboard_animate_leds() {
-  struct adb_cmd listen = {
-    .address = ADB_KB_ADDRESS,
-    .command = ADB_COMMAND_LISTEN,
-    .reg = 2
-  };
-  uint16_t states[] = {
-    //SCN: Scroll, Caps, Num
-    0b001,
-    0b011,
-    0b111,
-    0b111,
-    0b110,
-    0b100,
-    0b000,
-  };
-  for (int i = 0; i < sizeof(states) / sizeof(uint16_t); i++) {
-    adb_send_command(listen);
-    adb_command_data_16(~states[i]);
-    _delay_ms(50);
-  }
+void adb_send_high() {
+  ADB_LOW();
+  _delay_us(35);
+  ADB_HIGH();
+  _delay_us(65);
+}
+
+void adb_send_low() {
+  ADB_LOW();
+  _delay_us(65);
+  ADB_HIGH();
+  _delay_us(35);
 }
