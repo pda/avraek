@@ -35,5 +35,5 @@ void adb_send_low();
 void adb_send_high();
 uint8_t adb_cmd_to_byte(struct adb_cmd);
 uint16_t adb_read16();
-void adb_write16(uint16_t);
+void adb_command_data_16(uint16_t);
 void adb_keyboard_animate_leds();

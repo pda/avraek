@@ -97,7 +97,7 @@ uint16_t adb_read16() {
   return response;
 }
 
-void adb_write16(uint16_t data) {
+void adb_command_data_16(uint16_t data) {
   adb_data_mode_output();
   _delay_us(150); // Tlt (stop-to-start time)
   adb_send_high(); // start-bit
@@ -125,7 +125,7 @@ void adb_keyboard_animate_leds() {
   };
   for (int i = 0; i < sizeof(states) / sizeof(uint16_t); i++) {
     adb_send_command(listen);
-    adb_write16(~states[i]);
+    adb_command_data_16(~states[i]);
     _delay_ms(50);
   }
 }
