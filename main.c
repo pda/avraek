@@ -53,6 +53,8 @@ void initialize_adb_keyboard() {
     .reg = ADB_REGISTER_INFO
   };
   adb_send_command(cmd);
+  uint16_t response = adb_read16();
+  printf("response: 0x%04X\r\n", response);
 }
 
 int uart0_putchar_printf(char c, FILE *stream) {

@@ -4,6 +4,7 @@
 
 // Makefile provides these as compiler flags:
 // #define ADB_PORT PORTB
+// #define ADB_PIN PINB
 // #define ADB_DDR DDRB
 // #define ADB_DATA_PIN
 
@@ -32,3 +33,4 @@ void adb_command_byte(uint8_t byte);
 void adb_command_bit_low();
 void adb_command_bit_high();
 uint8_t adb_cmd_to_byte(struct adb_cmd);
+uint16_t adb_read16();
