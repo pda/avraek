@@ -71,7 +71,7 @@ uint8_t adb_cmd_to_byte(struct adb_cmd cmd) {
  * Read an expected 16-bit response from ADB device.
  * Assumes ADB_PORT's DDR is set to input.
  */
-uint16_t adb_read16() {
+uint16_t adb_receive_16() {
   // Timer/Counter0
   TCCR0A = 0; // defaults
   TCCR0B = 0; // defaults

@@ -44,7 +44,7 @@ void initialize_adb_keyboard() {
     .reg = ADB_REGISTER_INFO
   };
   adb_send_command(cmd);
-  adb_read16();
+  adb_receive_16();
   adb_keyboard_animate_leds();
 }
 
