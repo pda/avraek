@@ -48,6 +48,17 @@ void adb_keyboard_animate_leds() {
   }
 }
 
+void adb_keyboard_initialize() {
+  struct adb_cmd cmd = {
+    .address = ADB_KB_ADDRESS,
+    .command = ADB_COMMAND_TALK,
+    .reg = ADB_REGISTER_INFO
+  };
+  adb_send_command(cmd);
+  adb_receive_16();
+  adb_keyboard_animate_leds();
+}
+
 // Private
 
 uint8_t adb_cmd_to_byte(struct adb_cmd cmd) {

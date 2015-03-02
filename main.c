@@ -24,7 +24,7 @@ int main() {
 void setup() {
   initialize_uart();
   adb_reset();
-  initialize_adb_keyboard();
+  adb_keyboard_initialize();
 }
 
 void loop() {
@@ -35,17 +35,6 @@ void initialize_uart() {
   stdout = &uart0_stdout;
   sei();
   uart0_init(UART_BAUD_SELECT(UART_BAUD, F_CPU));
-}
-
-void initialize_adb_keyboard() {
-  struct adb_cmd cmd = {
-    .address = ADB_KB_ADDRESS,
-    .command = ADB_COMMAND_TALK,
-    .reg = ADB_REGISTER_INFO
-  };
-  adb_send_command(cmd);
-  adb_receive_16();
-  adb_keyboard_animate_leds();
 }
 
 int uart0_putchar_printf(char c, FILE *stream) {
