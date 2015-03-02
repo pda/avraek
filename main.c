@@ -4,12 +4,18 @@
 #include <avr/interrupt.h>
 #include <avr/io.h>
 #include <util/delay.h>
+#include <stdio.h>
 
 void setup();
 void loop();
 void initialize_uart();
 void initialize_adb();
 void initialize_adb_keyboard();
+int uart0_putchar_printf(char c, FILE *stream);
+
+static FILE uart0_stdout = FDEV_SETUP_STREAM(
+  uart0_putchar_printf, NULL, _FDEV_SETUP_WRITE
+);
 
 int main() {
   setup();
@@ -18,11 +24,12 @@ int main() {
 
 void setup() {
   initialize_uart();
-  uart0_puts("UART initialized\r\n");
+  printf("\n\n");
+  printf("Initializing ADB\n");
   initialize_adb();
-  uart0_puts("ADB initialized\r\n");
+  printf("Initializing keyboard\n");
   initialize_adb_keyboard();
-  uart0_puts("Keyboard initialized\r\n");
+  printf("Done\n");
 }
 
 void loop() {
@@ -30,6 +37,7 @@ void loop() {
 }
 
 void initialize_uart() {
+  stdout = &uart0_stdout;
   sei();
   uart0_init(UART_BAUD_SELECT(UART_BAUD, F_CPU));
 }
@@ -45,4 +53,10 @@ void initialize_adb_keyboard() {
     .reg = ADB_REGISTER_INFO
   };
   adb_send_command(cmd);
+}
+
+int uart0_putchar_printf(char c, FILE *stream) {
+  if (c == '\n') uart0_putc('\r');
+  uart0_putc(c);
+  return 0;
 }
