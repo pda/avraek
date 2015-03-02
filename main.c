@@ -55,6 +55,7 @@ void initialize_adb_keyboard() {
   adb_send_command(cmd);
   uint16_t response = adb_read16();
   printf("response: 0x%04X\r\n", response);
+  adb_keyboard_animate_leds();
 }
 
 int uart0_putchar_printf(char c, FILE *stream) {

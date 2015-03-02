@@ -93,3 +93,36 @@ uint16_t adb_read16() {
 
   return response;
 }
+
+void adb_write16(uint16_t data) {
+  adb_data_mode_output();
+  _delay_us(150); // Tlt (stop-to-start time)
+  adb_write_high(); // start-bit
+  adb_write8((uint8_t)(data >> 8));
+  adb_write8((uint8_t)data);
+  adb_write_low(); // stop-bit
+  adb_data_mode_input();
+}
+
+void adb_keyboard_animate_leds() {
+  struct adb_cmd listen = {
+    .address = ADB_KB_ADDRESS,
+    .command = ADB_COMMAND_LISTEN,
+    .reg = 2
+  };
+  uint16_t states[] = {
+    //SCN: Scroll, Caps, Num
+    0b001,
+    0b011,
+    0b111,
+    0b111,
+    0b110,
+    0b100,
+    0b000,
+  };
+  for (int i = 0; i < sizeof(states) / sizeof(uint16_t); i++) {
+    adb_send_command(listen);
+    adb_write16(~states[i]);
+    _delay_ms(50);
+  }
+}

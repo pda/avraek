@@ -13,6 +13,7 @@
 #define ADB_HIGH() (ADB_PORT |= ADB_DATA_MASK)
 #define ADB_LOW() (ADB_PORT &= ~ADB_DATA_MASK)
 
+#define ADB_COMMAND_LISTEN 0b10
 #define ADB_COMMAND_TALK 0b11
 #define ADB_KB_ADDRESS 0b0010
 #define ADB_REGISTER_DEFAULT 0b00
@@ -34,3 +35,5 @@ void adb_write_low();
 void adb_write_high();
 uint8_t adb_cmd_to_byte(struct adb_cmd);
 uint16_t adb_read16();
+void adb_write16(uint16_t);
+void adb_keyboard_animate_leds();
