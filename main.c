@@ -9,7 +9,6 @@
 void setup();
 void loop();
 void initialize_uart();
-void initialize_adb();
 void initialize_adb_keyboard();
 int uart0_putchar_printf(char c, FILE *stream);
 
@@ -26,7 +25,7 @@ void setup() {
   initialize_uart();
   printf("\n\n");
   printf("Initializing ADB\n");
-  initialize_adb();
+  adb_reset();
   printf("Initializing keyboard\n");
   initialize_adb_keyboard();
   printf("Done\n");
@@ -40,10 +39,6 @@ void initialize_uart() {
   stdout = &uart0_stdout;
   sei();
   uart0_init(UART_BAUD_SELECT(UART_BAUD, F_CPU));
-}
-
-void initialize_adb() {
-  adb_reset();
 }
 
 void initialize_adb_keyboard() {

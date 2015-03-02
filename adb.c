@@ -4,10 +4,13 @@
 #include <stdio.h>
 
 void adb_reset() {
+  _delay_ms(100); // stabilize on power-up
   adb_data_mode_output();
   ADB_LOW();
   _delay_ms(3);
+  ADB_HIGH();
   adb_data_mode_input();
+  _delay_ms(200); // give time to reset
 }
 
 void adb_data_mode_input() {
