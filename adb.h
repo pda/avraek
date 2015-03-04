@@ -30,11 +30,11 @@
   #error "ADB_PORT{A,B,C,D,E,F} required"
 #endif
 
-#ifndef ADB_PORT_PIN
-  #error "ADB_PORT_PIN required"
+#ifndef ADB_PORT_BIT
+  #error "ADB_PORT_BIT required"
 #endif
 
-#define ADB_DATA_MASK (1 << ADB_PORT_PIN)
+#define ADB_DATA_MASK (1 << ADB_PORT_BIT)
 
 #define ADB_HIGH() (ADB_PORT |= ADB_DATA_MASK)
 #define ADB_LOW() (ADB_PORT &= ~ADB_DATA_MASK)

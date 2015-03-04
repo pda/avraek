@@ -1,29 +1,40 @@
-MCU = atmega328p
-F_CPU = 16000000L
-UART_BAUD = 9600
-PROGRAMMER = arduino
-PORT = /dev/cu.usbmodem14231
-
+# Compile flags
 ADB_PORT = PORTB
-ADB_PORT_PIN = 0
+ADB_PORT_BIT = 0
+F_CPU = 16000000
+MCU = atmega328p
+UART_BAUD = 9600
 
-ADB_DEFINE_FLAGS = -DADB_$(ADB_PORT) -DADB_PORT_PIN=$(ADB_PORT_PIN)
-CC_DEFINE_FLAGS = -DF_CPU=$(F_CPU) -DUART_BAUD=$(UART_BAUD) $(ADB_DEFINE_FLAGS)
-CC_FLAGS = -std=c99 -Wall -g -Os -mmcu=$(MCU) $(CC_DEFINE_FLAGS)
+# ISP programmer flags
+ISP_MCU = $(MCU)
+ISP_PORT = /dev/cu.usbmodem14231
+ISP_PROGRAMMER = arduino
+
+# Make flags
+CC = avr-gcc
+LDFLAGS = -Wl,-Map,program.map
+CFLAGS = -std=c99 -Wall -g -Os -mmcu=$(MCU) \
+	-DF_CPU=$(F_CPU) \
+	-DUART_BAUD=$(UART_BAUD) \
+	-DADB_$(ADB_PORT) \
+	-DADB_PORT_BIT=$(ADB_PORT_BIT)
+
+SOURCES = main.c adb.c
+OBJECTS = $(SOURCES:.c=.o)
 
 .PHONY: all
-all: main.hex
+all: program.hex
 
 .PHONY: clean
 clean:
-	rm -f main.hex main.map main.o main.elf
+	rm -f program.elf program.hex $(OBJECTS)
 
 .PHONY: burn
-burn: main.hex
-	avrdude -q -q -p $(MCU) -c $(PROGRAMMER) -P $(PORT) -U main.hex
+burn: program.hex
+	avrdude -q -q -p $(ISP_MCU) -c $(ISP_PROGRAMMER) -P $(ISP_PORT) -U $<
 
-main.hex: main.elf
-	avr-objcopy -j .text -j .data -O ihex main.elf main.hex
+program.hex: program.elf
+	avr-objcopy -j .text -j .data -O ihex $< $@
 
-main.elf: main.c adb.c
-	avr-gcc $(CC_FLAGS) -Wl,-Map,main.map -o main.elf main.c adb.c avr-uart/uart.c
+program.elf: $(OBJECTS) avr-uart/uart.c
+	$(CC) $(CFLAGS) -o $@ $(OBJECTS) avr-uart/uart.c
