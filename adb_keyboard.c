@@ -13,19 +13,20 @@ void adb_keyboard_initialize() {
     .command = ADB_COMMAND_TALK,
     .reg = ADB_REGISTER_IDENTITY
   };
-  adb_send_command(cmd);
-  adb_receive_16();
+  struct adb_response_16 response;
+  adb_send_command(&cmd);
+  adb_receive_16(&response);
   adb_keyboard_animate_leds();
 }
 
-uint16_t adb_keyboard_poll() {
+void adb_keyboard_poll(struct adb_response_16 * response) {
   struct adb_cmd cmd = {
     .address = ADB_KB_ADDRESS,
     .command = ADB_COMMAND_TALK,
     .reg = 0
   };
-  adb_send_command(cmd);
-  return adb_receive_16();
+  adb_send_command(&cmd);
+  adb_receive_16(response);
 }
 
 // Private
@@ -47,7 +48,7 @@ static void adb_keyboard_animate_leds() {
     0b000,
   };
   for (int i = 0; i < sizeof(states) / sizeof(uint16_t); i++) {
-    adb_send_command(listen);
+    adb_send_command(&listen);
     adb_command_data_16(~states[i]);
     _delay_ms(50);
   }

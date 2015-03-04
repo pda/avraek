@@ -2,5 +2,7 @@
 
 #include <stdint.h>
 
+// Functions
+
 void adb_keyboard_initialize();
-uint16_t adb_keyboard_poll();
+void adb_keyboard_poll(struct adb_response_16 *);

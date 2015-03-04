@@ -30,9 +30,11 @@ void setup() {
 }
 
 void loop() {
-  uint16_t data;
-  data = adb_keyboard_poll();
-  printf("%02X %02X\n", data >> 8, data & 0xFF);
+  struct adb_response_16 response;
+  adb_keyboard_poll(&response);
+  if (!response.timed_out) {
+    printf("%02X %02X\n", response.a, response.b);
+  }
   _delay_ms(500);
 }
 

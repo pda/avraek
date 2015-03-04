@@ -21,9 +21,16 @@ struct adb_cmd {
   uint8_t reg;
 };
 
+struct adb_response_16 {
+  uint8_t timed_out;
+  uint8_t a;
+  uint8_t b;
+};
+
+
 // Functions
 
 void adb_command_data_16(uint16_t);
-uint16_t adb_receive_16();
+void adb_receive_16(struct adb_response_16 *);
 void adb_reset();
-void adb_send_command(struct adb_cmd);
+void adb_send_command(struct adb_cmd *);

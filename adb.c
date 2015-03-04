@@ -34,23 +34,25 @@ void adb_command_data_16(uint16_t data) {
  * Read an expected 16-bit response from ADB device.
  * Assumes ADB_PORT's DDR is set to input.
  */
-uint16_t adb_receive_16() {
+void adb_receive_16(struct adb_response_16 * response) {
   uint8_t low_times[18];
-
   for (int i = 0; i < 18; i++) {
-    if (adb_wait_for_low_with_timeout() != 0) return 0x0000;
+    if (adb_wait_for_low_with_timeout() != 0) {
+      response->timed_out = 1;
+      return;
+    }
     low_times[i] = adb_measure_time_until_high();
   }
 
-  uint16_t response = 0;
-
+  uint16_t value = 0;
   for (int i = 1; i < 17; i++) { // ignore start/stop bit
     uint8_t lt = low_times[i];
-    response <<= 1;
-    if (lt > 25 && lt < 45) response |= 1;
+    value <<= 1;
+    if (lt > 25 && lt < 45) value |= 1;
   }
 
-  return response;
+  response->a = (uint8_t)(value >> 8);
+  response->b = (uint8_t)value;
 }
 
 void adb_reset() {
@@ -63,7 +65,7 @@ void adb_reset() {
   _delay_ms(200); // give time to reset
 }
 
-void adb_send_command(struct adb_cmd cmd) {
+void adb_send_command(struct adb_cmd * cmd) {
   adb_data_mode_output();
   ADB_LOW();
   _delay_us(800); // Attention signal
@@ -76,11 +78,11 @@ void adb_send_command(struct adb_cmd cmd) {
 
 // Private
 
-static uint8_t adb_cmd_to_byte(struct adb_cmd cmd) {
-  return (cmd.address << 4) | (cmd.command << 2) | (cmd.reg);
+static uint8_t adb_cmd_to_byte(struct adb_cmd * cmd) {
+  return (cmd->address << 4) | (cmd->command << 2) | (cmd->reg);
 }
 
-static void adb_command_packet(struct adb_cmd cmd) {
+static void adb_command_packet(struct adb_cmd * cmd) {
   adb_send_byte(adb_cmd_to_byte(cmd));
   adb_send_low(); // stop-bit
 }

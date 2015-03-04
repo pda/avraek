@@ -43,8 +43,8 @@
 
 // Functions
 
-static uint8_t adb_cmd_to_byte(struct adb_cmd);
-static void adb_command_packet(struct adb_cmd);
+static uint8_t adb_cmd_to_byte(struct adb_cmd *);
+static void adb_command_packet(struct adb_cmd *);
 static void adb_data_mode_input();
 static void adb_data_mode_output();
 static uint8_t adb_measure_time_until_high();
