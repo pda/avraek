@@ -10,6 +10,7 @@
 
 void setup();
 void loop();
+void print_keyboard_transition(uint8_t t);
 void initialize_uart();
 void initialize_adb_keyboard();
 int uart0_putchar_printf(char c, FILE *stream);
@@ -33,9 +34,19 @@ void loop() {
   struct adb_response_16 response;
   adb_keyboard_poll(&response);
   if (!response.timed_out) {
-    printf("%02X %02X\n", response.a, response.b);
+    print_keyboard_transition(response.a);
+    print_keyboard_transition(response.b);
   }
-  _delay_ms(500);
+}
+
+void print_keyboard_transition(uint8_t t) {
+  if (t == 0xFF) return;
+  printf(
+    "%-4s: %02X (%d)\n",
+    (t & _BV(7)) ? "  up" : "down",
+    t & 0b01111111,
+    t & 0b01111111
+  );
 }
 
 void initialize_uart() {
