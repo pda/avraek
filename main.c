@@ -4,6 +4,7 @@
 #include <avr/interrupt.h>
 #include <avr/io.h>
 #include <util/delay.h>
+#include <stdint.h>
 #include <stdio.h>
 
 void setup();
@@ -28,7 +29,10 @@ void setup() {
 }
 
 void loop() {
-  _delay_ms(200);
+  uint16_t data;
+  data = adb_keyboard_poll();
+  printf("%02X %02X\n", data >> 8, data & 0xFF);
+  _delay_ms(500);
 }
 
 void initialize_uart() {
