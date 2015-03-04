@@ -19,7 +19,7 @@ CFLAGS = -std=c99 -Wall -g -Os -mmcu=$(MCU) \
 	-DADB_$(ADB_PORT) \
 	-DADB_PORT_BIT=$(ADB_PORT_BIT)
 
-SOURCES = main.c adb.c
+SOURCES = main.c adb.c adb_keyboard.c
 OBJECTS = $(SOURCES:.c=.o)
 
 .PHONY: all

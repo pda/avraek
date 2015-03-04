@@ -20,6 +20,39 @@
 
 // Public
 
+void adb_command_data_16(uint16_t data) {
+  adb_data_mode_output();
+  _delay_us(150); // Tlt (stop-to-start time)
+  adb_send_high(); // start-bit
+  adb_send_byte((uint8_t)(data >> 8));
+  adb_send_byte((uint8_t)data);
+  adb_send_low(); // stop-bit
+  adb_data_mode_input();
+}
+
+/**
+ * Read an expected 16-bit response from ADB device.
+ * Assumes ADB_PORT's DDR is set to input.
+ */
+uint16_t adb_receive_16() {
+  uint8_t low_times[18];
+
+  for (int i = 0; i < 18; i++) {
+    if (adb_wait_for_low_with_timeout() != 0) return 0x0000;
+    low_times[i] = adb_measure_time_until_high();
+  }
+
+  uint16_t response = 0;
+
+  for (int i = 1; i < 17; i++) { // ignore start/stop bit
+    uint8_t lt = low_times[i];
+    response <<= 1;
+    if (lt > 25 && lt < 45) response |= 1;
+  }
+
+  return response;
+}
+
 void adb_reset() {
   _delay_ms(100); // stabilize on power-up
   adb_data_mode_output();
@@ -40,41 +73,11 @@ void adb_send_command(struct adb_cmd cmd) {
   adb_data_mode_input();
 }
 
-void adb_keyboard_initialize() {
-  struct adb_cmd cmd = {
-    .address = ADB_KB_ADDRESS,
-    .command = ADB_COMMAND_TALK,
-    .reg = ADB_REGISTER_INFO
-  };
-  adb_send_command(cmd);
-  adb_receive_16();
-  adb_keyboard_animate_leds();
-}
-
-uint16_t adb_keyboard_poll() {
-  struct adb_cmd cmd = {
-    .address = ADB_KB_ADDRESS,
-    .command = ADB_COMMAND_TALK,
-    .reg = 0
-  };
-  adb_send_command(cmd);
-  return adb_receive_16();
-}
 
 // Private
 
 static uint8_t adb_cmd_to_byte(struct adb_cmd cmd) {
   return (cmd.address << 4) | (cmd.command << 2) | (cmd.reg);
-}
-
-static void adb_command_data_16(uint16_t data) {
-  adb_data_mode_output();
-  _delay_us(150); // Tlt (stop-to-start time)
-  adb_send_high(); // start-bit
-  adb_send_byte((uint8_t)(data >> 8));
-  adb_send_byte((uint8_t)data);
-  adb_send_low(); // stop-bit
-  adb_data_mode_input();
 }
 
 static void adb_command_packet(struct adb_cmd cmd) {
@@ -92,29 +95,6 @@ static void adb_data_mode_output() {
   ADB_DDR |= ADB_DATA_MASK;
 }
 
-static void adb_keyboard_animate_leds() {
-  struct adb_cmd listen = {
-    .address = ADB_KB_ADDRESS,
-    .command = ADB_COMMAND_LISTEN,
-    .reg = 2
-  };
-  uint16_t states[] = {
-    //SCN: Scroll, Caps, Num
-    0b001,
-    0b011,
-    0b111,
-    0b111,
-    0b110,
-    0b100,
-    0b000,
-  };
-  for (int i = 0; i < sizeof(states) / sizeof(uint16_t); i++) {
-    adb_send_command(listen);
-    adb_command_data_16(~states[i]);
-    _delay_ms(50);
-  }
-}
-
 static uint8_t adb_measure_time_until_high() {
   TCCR0A = 0x00; // defaults
   TCCR0B = 0x00; // defaults, stop timer clock source
@@ -123,29 +103,6 @@ static uint8_t adb_measure_time_until_high() {
   while (ADB_IS_LOW); // TODO: timeout?
   TCCR0B = 0x00; // stop clock
   return (uint8_t)((uint16_t)TCNT0 * 8 / (F_CPU / 1000000));
-}
-
-/**
- * Read an expected 16-bit response from ADB device.
- * Assumes ADB_PORT's DDR is set to input.
- */
-static uint16_t adb_receive_16() {
-  uint8_t low_times[18];
-
-  for (int i = 0; i < 18; i++) {
-    if (adb_wait_for_low_with_timeout() != 0) return 0x0000;
-    low_times[i] = adb_measure_time_until_high();
-  }
-
-  uint16_t response = 0;
-
-  for (int i = 1; i < 17; i++) { // ignore start/stop bit
-    uint8_t lt = low_times[i];
-    response <<= 1;
-    if (lt > 25 && lt < 45) response |= 1;
-  }
-
-  return response;
 }
 
 static void adb_send_byte(uint8_t byte) {

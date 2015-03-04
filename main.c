@@ -1,4 +1,5 @@
 #include "adb.h"
+#include "adb_keyboard.h"
 #include "avr-uart/uart.h"
 
 #include <avr/interrupt.h>

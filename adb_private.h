@@ -41,32 +41,14 @@
 #define ADB_IS_HIGH (ADB_PIN & ADB_DATA_MASK)
 #define ADB_IS_LOW (!(ADB_PIN & ADB_DATA_MASK))
 
-#define ADB_COMMAND_LISTEN 0b10
-#define ADB_COMMAND_TALK 0b11
-#define ADB_KB_ADDRESS 0b0010
-#define ADB_REGISTER_DEFAULT 0b00
-#define ADB_REGISTER_INFO 0b11
-
-// Types
-
-struct adb_cmd {
-  uint8_t address;
-  uint8_t command;
-  uint8_t reg;
-};
-
 // Functions
 
 static uint8_t adb_cmd_to_byte(struct adb_cmd);
-static void adb_command_data_16(uint16_t);
 static void adb_command_packet(struct adb_cmd);
 static void adb_data_mode_input();
 static void adb_data_mode_output();
-static void adb_keyboard_animate_leds();
 static uint8_t adb_measure_time_until_high();
-static uint16_t adb_receive_16();
 static void adb_send_byte(uint8_t byte);
-static void adb_send_command(struct adb_cmd);
 static void adb_send_high();
 static void adb_send_low();
 static uint8_t adb_wait_for_low_with_timeout();
