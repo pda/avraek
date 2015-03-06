@@ -3,7 +3,6 @@ ADB_PORT = PORTB
 ADB_PORT_BIT = 0
 F_CPU = 16000000
 MCU = atmega328p
-UART_BAUD = 9600
 
 # ISP programmer flags
 ISP_MCU = $(MCU)
@@ -15,7 +14,6 @@ CC = avr-gcc
 LDFLAGS = -Wl,-Map,program.map
 CFLAGS = -std=c99 -Wall -g -Os -mmcu=$(MCU) \
 	-DF_CPU=$(F_CPU) \
-	-DUART_BAUD=$(UART_BAUD) \
 	-DADB_$(ADB_PORT) \
 	-DADB_PORT_BIT=$(ADB_PORT_BIT)
 
@@ -36,5 +34,5 @@ burn: program.hex
 program.hex: program.elf
 	avr-objcopy -j .text -j .data -O ihex $< $@
 
-program.elf: $(OBJECTS) avr-uart/uart.c
-	$(CC) $(CFLAGS) -o $@ $(OBJECTS) avr-uart/uart.c
+program.elf: $(OBJECTS)
+	$(CC) $(CFLAGS) -o $@ $(OBJECTS)
