@@ -1,13 +1,16 @@
 # Compile flags
-ADB_PORT = PORTB
-ADB_PORT_BIT = 0
-F_CPU = 16000000
-MCU = atmega328p
+ADB_PORT ?= PORTB
+ADB_PORT_BIT ?= 0
+F_CPU ?= 16000000
+MCU ?= atmega328p
 
 # ISP programmer flags
 ISP_MCU = $(MCU)
-ISP_PORT = /dev/cu.usbmodem14231
-ISP_PROGRAMMER = arduino
+ISP_PROGRAMMER ?= arduino
+AVRDUDE_FLAGS = -q -q -p $(ISP_MCU) -c $(ISP_PROGRAMMER)
+ifdef ISP_PORT
+	AVRDUDE_FLAGS += -P $(ISP_PORT)
+endif
 
 # Make flags
 CC = avr-gcc
@@ -29,7 +32,7 @@ clean:
 
 .PHONY: burn
 burn: program.hex
-	avrdude -q -q -p $(ISP_MCU) -c $(ISP_PROGRAMMER) -P $(ISP_PORT) -U $<
+	avrdude $(AVRDUDE_FLAGS) -U $<
 
 program.hex: program.elf
 	avr-objcopy -j .text -j .data -O ihex $< $@

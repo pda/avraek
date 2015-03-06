@@ -1,5 +1,7 @@
 #pragma once
 
+#include "iocompat.h"
+
 #include <stdint.h>
 
 // Constants
