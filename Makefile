@@ -15,13 +15,16 @@ endif
 # Make flags
 CC = avr-gcc
 LDFLAGS = -Wl,-Map,program.map
-CFLAGS = -std=c99 -Wall -g -Os -mmcu=$(MCU) \
+COMPILEFLAGS = -Wall -g -Os -mmcu=$(MCU) \
 	-DF_CPU=$(F_CPU) \
 	-DADB_$(ADB_PORT) \
 	-DADB_PORT_BIT=$(ADB_PORT_BIT)
+CFLAGS = -std=c99 $(COMPILEFLAGS)
+ASFLAGS = $(COMPILEFLAGS)
 
 SOURCES = main.c adb.c adb_keyboard.c
-OBJECTS = $(SOURCES:.c=.o)
+VUSB_OBJECTS = usbdrv/usbdrv.o usbdrv/usbdrvasm.o usbdrv/oddebug.o
+OBJECTS = $(SOURCES:.c=.o) $(VUSB_OBJECTS)
 
 .PHONY: all
 all: program.hex
