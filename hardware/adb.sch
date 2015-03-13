@@ -6,7 +6,7 @@
 <setting alwaysvectorfont="yes"/>
 <setting verticaltext="up"/>
 </settings>
-<grid distance="0.1" unitdist="inch" unit="inch" style="lines" multiple="1" display="yes" altdistance="0.01" altunitdist="inch" altunit="inch"/>
+<grid distance="0.1" unitdist="inch" unit="inch" style="lines" multiple="1" display="no" altdistance="0.01" altunitdist="inch" altunit="inch"/>
 <layers>
 <layer number="1" name="Top" color="4" fill="1" visible="no" active="no"/>
 <layer number="16" name="Bottom" color="1" fill="1" visible="no" active="no"/>
@@ -2059,6 +2059,8 @@ Based on TE part number 1981568-1</description>
 <part name="USB1" library="dangerousprototypes_devices" deviceset="CON-USB-F" device="-MICRO-B" value=""/>
 <part name="R3" library="SparkFun-Passives" deviceset="RESISTOR" device="0805-RES" value="2K2"/>
 <part name="SUPPLY4" library="SparkFun-Aesthetics" deviceset="VCC" device=""/>
+<part name="R4" library="SparkFun-Passives" deviceset="RESISTOR" device="0805-RES" value="10K"/>
+<part name="SUPPLY6" library="SparkFun-Aesthetics" deviceset="VCC" device=""/>
 </parts>
 <sheets>
 <sheet>
@@ -2073,8 +2075,8 @@ Based on TE part number 1981568-1</description>
 <instance part="SUPPLY1" gate="G$1" x="0" y="50.8"/>
 <instance part="SUPPLY2" gate="G$1" x="88.9" y="50.8"/>
 <instance part="SUPPLY3" gate="G$1" x="27.94" y="17.78"/>
-<instance part="R2" gate="G$1" x="55.88" y="38.1"/>
-<instance part="R1" gate="G$1" x="48.26" y="43.18"/>
+<instance part="R2" gate="G$1" x="45.72" y="38.1"/>
+<instance part="R1" gate="G$1" x="53.34" y="43.18"/>
 <instance part="D1" gate="G$1" x="73.66" y="27.94" rot="R90"/>
 <instance part="D2" gate="G$1" x="78.74" y="22.86" rot="R90"/>
 <instance part="GND2" gate="1" x="76.2" y="2.54"/>
@@ -2085,6 +2087,8 @@ Based on TE part number 1981568-1</description>
 <instance part="USB1" gate="USB" x="99.06" y="40.64" rot="R180"/>
 <instance part="R3" gate="G$1" x="73.66" y="48.26"/>
 <instance part="SUPPLY4" gate="G$1" x="78.74" y="50.8"/>
+<instance part="R4" gate="G$1" x="53.34" y="30.48"/>
+<instance part="SUPPLY6" gate="G$1" x="58.42" y="30.48"/>
 </instances>
 <busses>
 </busses>
@@ -2120,6 +2124,10 @@ Based on TE part number 1981568-1</description>
 <pinref part="R3" gate="G$1" pin="2"/>
 <pinref part="SUPPLY4" gate="G$1" pin="VCC"/>
 <wire x1="78.74" y1="48.26" x2="78.74" y2="50.8" width="0.1524" layer="91"/>
+</segment>
+<segment>
+<pinref part="R4" gate="G$1" pin="2"/>
+<pinref part="SUPPLY6" gate="G$1" pin="VCC"/>
 </segment>
 </net>
 <net name="GND" class="0">
@@ -2165,7 +2173,7 @@ Based on TE part number 1981568-1</description>
 <segment>
 <pinref part="U1" gate="G$1" pin="PB2(SCK/ADC1)"/>
 <pinref part="R2" gate="G$1" pin="1"/>
-<wire x1="30.48" y1="38.1" x2="50.8" y2="38.1" width="0.1524" layer="91"/>
+<wire x1="30.48" y1="38.1" x2="40.64" y2="38.1" width="0.1524" layer="91"/>
 </segment>
 <segment>
 <pinref part="ICSP" gate="G$1" pin="3"/>
@@ -2181,7 +2189,7 @@ Based on TE part number 1981568-1</description>
 <wire x1="83.82" y1="40.64" x2="93.98" y2="40.64" width="0.1524" layer="91"/>
 <wire x1="78.74" y1="38.1" x2="78.74" y2="25.4" width="0.1524" layer="91"/>
 <pinref part="R2" gate="G$1" pin="2"/>
-<wire x1="60.96" y1="38.1" x2="68.58" y2="38.1" width="0.1524" layer="91"/>
+<wire x1="50.8" y1="38.1" x2="68.58" y2="38.1" width="0.1524" layer="91"/>
 <junction x="78.74" y="38.1"/>
 <pinref part="USB1" gate="USB" pin="D-"/>
 <pinref part="R3" gate="G$1" pin="1"/>
@@ -2193,7 +2201,7 @@ Based on TE part number 1981568-1</description>
 <net name="D+" class="0">
 <segment>
 <pinref part="R1" gate="G$1" pin="2"/>
-<wire x1="53.34" y1="43.18" x2="73.66" y2="43.18" width="0.1524" layer="91"/>
+<wire x1="58.42" y1="43.18" x2="73.66" y2="43.18" width="0.1524" layer="91"/>
 <pinref part="D1" gate="G$1" pin="C"/>
 <wire x1="78.74" y1="43.18" x2="73.66" y2="43.18" width="0.1524" layer="91"/>
 <wire x1="73.66" y1="43.18" x2="93.98" y2="43.18" width="0.1524" layer="91"/>
@@ -2206,7 +2214,7 @@ Based on TE part number 1981568-1</description>
 <segment>
 <pinref part="R1" gate="G$1" pin="1"/>
 <pinref part="U1" gate="G$1" pin="PB0(MOSI)"/>
-<wire x1="43.18" y1="43.18" x2="30.48" y2="43.18" width="0.1524" layer="91"/>
+<wire x1="48.26" y1="43.18" x2="30.48" y2="43.18" width="0.1524" layer="91"/>
 </segment>
 <segment>
 <pinref part="ICSP" gate="G$1" pin="4"/>
@@ -2229,8 +2237,8 @@ Based on TE part number 1981568-1</description>
 <net name="RESET" class="0">
 <segment>
 <pinref part="U1" gate="G$1" pin="PB5(NRES)"/>
-<wire x1="30.48" y1="30.48" x2="38.1" y2="30.48" width="0.1524" layer="91"/>
-<label x="38.1" y="30.48" size="1.778" layer="95"/>
+<wire x1="30.48" y1="30.48" x2="48.26" y2="30.48" width="0.1524" layer="91"/>
+<pinref part="R4" gate="G$1" pin="1"/>
 </segment>
 <segment>
 <pinref part="ICSP" gate="G$1" pin="5"/>
