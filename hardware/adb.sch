@@ -1,6 +1,6 @@
 <?xml version="1.0" encoding="utf-8"?>
 <!DOCTYPE eagle SYSTEM "eagle.dtd">
-<eagle version="7.1.0">
+<eagle version="7.2.0">
 <drawing>
 <settings>
 <setting alwaysvectorfont="yes"/>
@@ -2246,7 +2246,7 @@ Based on TE part number 1981568-1</description>
 <label x="38.1" y="7.62" size="1.778" layer="95"/>
 </segment>
 </net>
-<net name="N$2" class="0">
+<net name="PB4" class="0">
 <segment>
 <pinref part="U1" gate="G$1" pin="PB4(ADC2)"/>
 <wire x1="30.48" y1="33.02" x2="33.02" y2="33.02" width="0.1524" layer="91"/>
@@ -2255,7 +2255,7 @@ Based on TE part number 1981568-1</description>
 <wire x1="33.02" y1="12.7" x2="25.4" y2="12.7" width="0.1524" layer="91"/>
 </segment>
 </net>
-<net name="N$5" class="0">
+<net name="PB3" class="0">
 <segment>
 <pinref part="U1" gate="G$1" pin="PB3(ADC3)"/>
 <wire x1="30.48" y1="35.56" x2="35.56" y2="35.56" width="0.1524" layer="91"/>
