@@ -4,6 +4,9 @@
 eagle.epf
 
 # Geber files
+*.ger
+*.xln
+*.gpi
 *.GBL
 *.GBO
 *.GBP
