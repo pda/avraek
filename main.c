@@ -2,6 +2,7 @@
 #include "adb_keyboard.h"
 #include "keybuffer.h"
 #include "usbdrv/usbdrv.h"
+#include "keymap.h"
 
 #include <avr/interrupt.h>
 #include <avr/io.h>
@@ -77,7 +78,7 @@ static void poll_usb() {
 static void handle_keyboard_transition(uint8_t t) {
   if (t == 0xFF) return;
   uint8_t isUp = t >> 7;
-  uint8_t key = t & 0x7F;
+  uint8_t key = aek2_keymap[t & 0x7F];
   if (isUp) {
     keybuffer_up(&keybuffer, key);
   } else {
