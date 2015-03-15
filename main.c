@@ -8,61 +8,77 @@
 #include <stdint.h>
 #include <stdio.h>
 
-void setup();
-void setup_adb();
-void setup_usb();
-void loop();
-void adb_poll();
-void print_keyboard_transition(uint8_t t);
-void initialize_adb_keyboard();
+static void setup();
+static void setup_adb();
+static void setup_usb();
+static void loop();
+static void poll_adb();
+static void poll_usb();
+static void handle_keyboard_transition(uint8_t t);
+
+struct keyboard_report_t {
+	uint8_t modifier;
+	uint8_t reserved;
+	uint8_t keycode[6];
+};
+
+static struct keyboard_report_t keyboard_report;
+static uchar idleRate; // repeat rate for keyboards
 
 int main() {
   setup();
   while (1) loop();
 }
 
-void setup() {
+static void setup() {
   setup_usb();
   setup_adb();
   sei();
 }
 
-void setup_adb() {
+static void setup_adb() {
   adb_reset();
   adb_keyboard_initialize();
 }
 
-void setup_usb() {
+static void setup_usb() {
   usbInit();
   usbDeviceDisconnect();
   _delay_ms(500);
   usbDeviceConnect();
 }
 
-void loop() {
-  adb_poll();
-  usbPoll();
+static void loop() {
+  poll_adb();
+  poll_usb();
 }
 
-void adb_poll() {
+static void poll_adb() {
   struct adb_response_16 response;
   adb_keyboard_poll(&response);
   if (!response.timed_out) {
-    print_keyboard_transition(response.a);
-    print_keyboard_transition(response.b);
+    handle_keyboard_transition(response.a);
+    handle_keyboard_transition(response.b);
   }
 }
 
-void print_keyboard_transition(uint8_t t) {
+static void poll_usb() {
+  usbPoll(); // delegate to V-USB
+}
+
+static void handle_keyboard_transition(uint8_t t) {
   if (t == 0xFF) return;
-  // ...
+  uint8_t isUp = t >> 7;
+  uint8_t key = t & 0x7F;
+  if (isUp) {
+    keyboard_report.keycode[0] = key;
+  } else {
+    keyboard_report.keycode[0] = 0;
+  }
+  usbSetInterrupt((void *)&keyboard_report, sizeof(keyboard_report));
 }
 
 // V-USB
-
-usbMsgLen_t usbFunctionSetup(uchar data[8]) {
-  return 0;
-}
 
 // USB HID descriptor
 // From http://codeandlife.com/2012/06/18/usb-hid-keyboard-with-v-usb/ which in
@@ -101,3 +117,32 @@ PROGMEM const char usbHidReportDescriptor[USB_CFG_HID_REPORT_DESCRIPTOR_LENGTH] 
     0x81, 0x00,                    //   INPUT (Data,Ary,Abs)
     0xc0                           // END_COLLECTION
 };
+
+// Thanks to http://codeandlife.com/2012/06/18/usb-hid-keyboard-with-v-usb/
+usbMsgLen_t usbFunctionSetup(uchar data[8]) {
+  usbRequest_t *rq = (void *)data;
+  if ((rq->bmRequestType & USBRQ_TYPE_MASK) == USBRQ_TYPE_CLASS) {
+    switch(rq->bRequest) {
+
+      case USBRQ_HID_GET_REPORT:
+        usbMsgPtr = (void *)&keyboard_report;
+        return sizeof(keyboard_report);
+
+      case USBRQ_HID_SET_REPORT: // if wLength == 1, should be LED state
+        return (rq->wLength.word == 1) ? USB_NO_MSG : 0;
+
+      case USBRQ_HID_GET_IDLE: // send idle rate to PC as required by spec
+        usbMsgPtr = &idleRate;
+        return 1;
+
+      case USBRQ_HID_SET_IDLE: // save idle rate as required by spec
+        idleRate = rq->wValue.bytes[1];
+        return 0;
+    }
+  }
+  return 0;
+}
+
+usbMsgLen_t usbFunctionWrite(uint8_t * data, uchar len) {
+  return 1;
+}
