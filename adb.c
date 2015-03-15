@@ -51,6 +51,7 @@ void adb_receive_16(struct adb_response_16 * response) {
     if (lt > 25 && lt < 45) value |= 1;
   }
 
+  response->timed_out = 0;
   response->a = (uint8_t)(value >> 8);
   response->b = (uint8_t)value;
 }
