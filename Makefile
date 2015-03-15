@@ -22,7 +22,7 @@ COMPILEFLAGS = -Wall -g -Os -mmcu=$(MCU) \
 CFLAGS = -std=c99 $(COMPILEFLAGS)
 ASFLAGS = $(COMPILEFLAGS)
 
-SOURCES = main.c adb.c adb_keyboard.c
+SOURCES = main.c adb.c adb_keyboard.c keybuffer.c
 VUSB_OBJECTS = usbdrv/usbdrv.o usbdrv/usbdrvasm.o usbdrv/oddebug.o
 OBJECTS = $(SOURCES:.c=.o) $(VUSB_OBJECTS)
 

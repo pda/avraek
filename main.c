@@ -1,5 +1,6 @@
 #include "adb.h"
 #include "adb_keyboard.h"
+#include "keybuffer.h"
 #include "usbdrv/usbdrv.h"
 
 #include <avr/interrupt.h>
@@ -9,6 +10,7 @@
 #include <stdio.h>
 
 static void setup();
+static void setup_keybuffer();
 static void setup_adb();
 static void setup_usb();
 static void loop();
@@ -22,6 +24,7 @@ struct keyboard_report_t {
 	uint8_t keycode[6];
 };
 
+static struct keybuffer_t keybuffer;
 static struct keyboard_report_t keyboard_report;
 static uchar idleRate; // repeat rate for keyboards
 
@@ -31,9 +34,14 @@ int main() {
 }
 
 static void setup() {
+  setup_keybuffer();
   setup_usb();
   setup_adb();
   sei();
+}
+
+static void setup_keybuffer() {
+  keybuffer_init(&keybuffer, &(keyboard_report.keycode[0]));
 }
 
 static void setup_adb() {
@@ -71,9 +79,9 @@ static void handle_keyboard_transition(uint8_t t) {
   uint8_t isUp = t >> 7;
   uint8_t key = t & 0x7F;
   if (isUp) {
-    keyboard_report.keycode[0] = key;
+    keybuffer_up(&keybuffer, key);
   } else {
-    keyboard_report.keycode[0] = 0;
+    keybuffer_down(&keybuffer, key);
   }
   usbSetInterrupt((void *)&keyboard_report, sizeof(keyboard_report));
 }
