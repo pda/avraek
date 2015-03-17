@@ -17,6 +17,8 @@ void adb_keyboard_initialize() {
     .reg = ADB_REGISTER_IDENTITY
   };
   struct adb_response_16 response;
+
+  adb_reset();
   adb_send_command(&cmd);
   adb_receive_16(&response);
   adb_keyboard_animate_leds();

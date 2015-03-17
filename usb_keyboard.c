@@ -10,6 +10,7 @@ static uchar idleRate; // repeat rate for keyboards
 // Public
 
 void usb_keyboard_init() {
+  keybuffer_init(&keybuffer, &(keyboard_report.keycode[0]));
   keyboard_report.modifier = 0;
   usbInit();
   usbDeviceDisconnect();

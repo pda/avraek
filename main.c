@@ -9,37 +9,17 @@
 #include <avr/io.h>
 #include <stdint.h>
 
-static void setup();
-static void setup_keybuffer();
-static void setup_adb();
-static void loop();
 static void poll_adb();
 static void handle_keyboard_transition(uint8_t t);
 
 int main() {
-  setup();
-  while (1) loop();
-}
-
-static void setup() {
-  setup_keybuffer();
   usb_keyboard_init();
-  setup_adb();
-  sei();
-}
-
-static void setup_keybuffer() {
-  keybuffer_init(&keybuffer, &(keyboard_report.keycode[0]));
-}
-
-static void setup_adb() {
-  adb_reset();
   adb_keyboard_initialize();
-}
-
-static void loop() {
-  poll_adb();
-  usb_keyboard_poll();
+  sei();
+  while (1) {
+    poll_adb();
+    usb_keyboard_poll();
+  }
 }
 
 static void poll_adb() {
