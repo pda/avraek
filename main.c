@@ -70,6 +70,9 @@ static void poll_adb() {
   if (!response.timed_out) {
     handle_keyboard_transition(response.a);
     handle_keyboard_transition(response.b);
+    if (usbInterruptIsReady()) {
+      usbSetInterrupt((void *)&keyboard_report, sizeof(keyboard_report));
+    }
   }
 }
 
@@ -119,7 +122,6 @@ static void handle_keyboard_transition(uint8_t t) {
         break;
     }
   }
-  usbSetInterrupt((void *)&keyboard_report, sizeof(keyboard_report));
 }
 
 // V-USB
