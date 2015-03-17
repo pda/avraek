@@ -1,7 +1,11 @@
 #include "keybuffer.h"
 #include "string.h"
 
+// Private headers
+
 static int8_t keybuffer_find(struct keybuffer_t *, uint8_t key);
+
+// Public functions
 
 void keybuffer_init(struct keybuffer_t * kb, uint8_t * keys) {
   memset((void *)keys, 0, KEYBUFFER_SIZE * sizeof(uint8_t));
@@ -25,6 +29,8 @@ void keybuffer_up(struct keybuffer_t * kb, uint8_t key) {
     kb->keys[i] = 0;
   }
 }
+
+// Private functions
 
 static int8_t keybuffer_find(struct keybuffer_t * kb, uint8_t key) {
   for (int i = 0; i < KEYBUFFER_SIZE; i++) {
