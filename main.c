@@ -1,5 +1,6 @@
 #include "adb.h"
 #include "adb_keyboard.h"
+#include "aek2_keys.h"
 #include "keybuffer.h"
 #include "usbdrv/usbdrv.h"
 #include "keymap.h"
@@ -51,6 +52,7 @@ static void setup_adb() {
 }
 
 static void setup_usb() {
+  keyboard_report.modifier = 0;
   usbInit();
   usbDeviceDisconnect();
   _delay_ms(500);
@@ -78,11 +80,44 @@ static void poll_usb() {
 static void handle_keyboard_transition(uint8_t t) {
   if (t == 0xFF) return;
   uint8_t isUp = t >> 7;
-  uint8_t key = aek2_keymap[t & 0x7F];
+  uint8_t key_adb = t & 0x7F;
+  uint8_t key_usb = aek2_keymap[key_adb];
   if (isUp) {
-    keybuffer_up(&keybuffer, key);
+    switch (key_adb) {
+      case ADB_KEY_CTRL:
+        keyboard_report.modifier &= ~_BV(0);
+        break;
+      case ADB_KEY_SHIFT:
+        keyboard_report.modifier &= ~_BV(1);
+        break;
+      case ADB_KEY_OPTION:
+        keyboard_report.modifier &= ~_BV(2);
+        break;
+      case ADB_KEY_CMD:
+        keyboard_report.modifier &= ~_BV(3);
+        break;
+      default:
+        keybuffer_up(&keybuffer, key_usb);
+        break;
+    }
   } else {
-    keybuffer_down(&keybuffer, key);
+    switch (key_adb) {
+      case ADB_KEY_CTRL:
+        keyboard_report.modifier |= _BV(0);
+        break;
+      case ADB_KEY_SHIFT:
+        keyboard_report.modifier |= _BV(1);
+        break;
+      case ADB_KEY_OPTION:
+        keyboard_report.modifier |= _BV(2);
+        break;
+      case ADB_KEY_CMD:
+        keyboard_report.modifier |= _BV(3);
+        break;
+      default:
+        keybuffer_down(&keybuffer, key_usb);
+        break;
+    }
   }
   usbSetInterrupt((void *)&keyboard_report, sizeof(keyboard_report));
 }
