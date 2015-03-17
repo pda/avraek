@@ -1,3 +1,12 @@
+/**************************************************************
+  Test program for keybuffer.
+  Build and run with something like this:
+
+  clang -c -o keybuffer_x86.o keybuffer.c &&
+      clang -o test_keybuffer keybuffer_x86.o test_keybuffer.c &&
+      ./test_keybuffer
+**************************************************************/
+
 #include <stdio.h>
 #include <stdlib.h>
 
