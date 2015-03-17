@@ -41,8 +41,16 @@
 
 #define ADB_DATA_MASK (1 << ADB_PORT_BIT)
 
-#define ADB_HIGH() (ADB_PORT |= ADB_DATA_MASK)
-#define ADB_LOW() (ADB_PORT &= ~ADB_DATA_MASK)
+// Allow external pull-up to signal HIGH by entering hi-Z input mode.
+#define ADB_HIGH() \
+  (ADB_DDR &= ~ADB_DATA_MASK); \
+  (ADB_PORT &= ~ADB_DATA_MASK)
+
+// Drive signal LOW.
+#define ADB_LOW() \
+  (ADB_DDR |= ADB_DATA_MASK); \
+  (ADB_PORT &= ~ADB_DATA_MASK)
+
 #define ADB_IS_HIGH (ADB_PIN & ADB_DATA_MASK)
 #define ADB_IS_LOW (!(ADB_PIN & ADB_DATA_MASK))
 
@@ -60,8 +68,6 @@
 
 static uint8_t adb_cmd_to_byte(struct adb_cmd *);
 static void adb_command_packet(struct adb_cmd *);
-static void adb_data_mode_input();
-static void adb_data_mode_output();
 static uint8_t adb_measure_time_until_high();
 static void adb_send_byte(uint8_t byte);
 static void adb_send_high();
@@ -71,13 +77,11 @@ static uint8_t adb_wait_for_low_with_timeout();
 // Public
 
 void adb_command_data_16(uint16_t data) {
-  adb_data_mode_output();
   _delay_us(150); // Tlt (stop-to-start time)
   adb_send_high(); // start-bit
   adb_send_byte((uint8_t)(data >> 8));
   adb_send_byte((uint8_t)data);
   adb_send_low(); // stop-bit
-  adb_data_mode_input();
 }
 
 /**
@@ -108,22 +112,18 @@ void adb_receive_16(struct adb_response_16 * response) {
 
 void adb_reset() {
   _delay_ms(100); // stabilize on power-up
-  adb_data_mode_output();
   ADB_LOW();
   _delay_ms(3);
   ADB_HIGH();
-  adb_data_mode_input();
   _delay_ms(200); // give time to reset
 }
 
 void adb_send_command(struct adb_cmd * cmd) {
-  adb_data_mode_output();
   ADB_LOW();
   _delay_us(800); // Attention signal
   ADB_HIGH();
   _delay_us(70); // Sync signal
   adb_command_packet(cmd);
-  adb_data_mode_input();
 }
 
 
@@ -136,16 +136,6 @@ static uint8_t adb_cmd_to_byte(struct adb_cmd * cmd) {
 static void adb_command_packet(struct adb_cmd * cmd) {
   adb_send_byte(adb_cmd_to_byte(cmd));
   adb_send_low(); // stop-bit
-}
-
-static void adb_data_mode_input() {
-  ADB_DDR &= ~ADB_DATA_MASK;
-  ADB_PORT &= ~ADB_DATA_MASK; // hi-Z input
-}
-
-static void adb_data_mode_output() {
-  ADB_HIGH(); // output high to match pull-up resistor
-  ADB_DDR |= ADB_DATA_MASK;
 }
 
 static uint8_t adb_measure_time_until_high() {
