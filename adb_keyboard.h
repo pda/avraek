@@ -1,7 +1,5 @@
 #pragma once
 
-#include <stdint.h>
-
 // Functions
 
 void adb_keyboard_initialize();
