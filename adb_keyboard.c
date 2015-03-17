@@ -1,9 +1,12 @@
 #include "adb.h"
 #include "adb_keyboard.h"
-#include "adb_keyboard_private.h"
 
 #include <stdint.h>
 #include <util/delay.h>
+
+// Private headers
+
+static void adb_keyboard_animate_leds();
 
 // Public
 
