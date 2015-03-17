@@ -7,9 +7,7 @@
 
 #include <avr/interrupt.h>
 #include <avr/io.h>
-#include <util/delay.h>
 #include <stdint.h>
-#include <stdio.h>
 
 static void setup();
 static void setup_keybuffer();
@@ -97,4 +95,3 @@ static void handle_keyboard_transition(uint8_t t) {
     }
   }
 }
-
