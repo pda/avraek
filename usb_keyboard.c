@@ -1,5 +1,6 @@
 #include "usb_keyboard.h"
 #include "usbdrv/usbdrv.h"
+#include "usbdrv/osccal.h"
 
 #include <util/delay.h>
 

@@ -23,7 +23,7 @@ CFLAGS = -std=c99 $(COMPILEFLAGS)
 ASFLAGS = $(COMPILEFLAGS)
 
 SOURCES = main.c adb.c adb_keyboard.c keybuffer.c usb_keyboard.c
-VUSB_OBJECTS = usbdrv/usbdrv.o usbdrv/usbdrvasm.o usbdrv/oddebug.o
+VUSB_OBJECTS = usbdrv/usbdrv.o usbdrv/usbdrvasm.o usbdrv/osccal.o
 OBJECTS = $(SOURCES:.c=.o) $(VUSB_OBJECTS)
 
 .PHONY: all
